@@ -26,14 +26,36 @@ parse(文档解析) → extract(LLM 指标抽取) → analyze(LLM 分析)
 
 ## 快速开始
 
+支持两种模型配置方式（二选一，推荐 .env）：
+
+**方式 A：.env 文件（推荐）**
+
+复制 `.env.example` 为 `.env`，填入你的模型配置（本地 Ollama / OpenRouter / 任意 OpenAI 兼容 API 均可）：
+
 ```bash
-pip install -r requirements.txt
+pip install -r scripts/requirements.txt
+cp .env.example .env   # 编辑 .env 填入 LLM_BASE_URL / LLM_API_KEY / LLM_MODEL
+python scripts/run.py examples/sample-input.json -o output/
+```
+
+**方式 B：环境变量**
+
+```bash
+pip install -r scripts/requirements.txt
 export LLM_BASE_URL=http://localhost:11434/v1   # 默认 Ollama 本地模型
 export LLM_MODEL=qwen2.5:7b
 python scripts/run.py examples/sample-input.json -o output/
 ```
 
-把真实财报 PDF 放入 `examples/` 并修改 `sample-input.json` 的 `report_path` 后重跑。
+OpenRouter 示例（免费模型）：
+
+```bash
+LLM_BASE_URL=https://openrouter.ai/api/v1
+LLM_MODEL=nvidia/nemotron-3-ultra-550b-a55b:free
+LLM_API_KEY=sk-or-v1-你的key
+```
+
+无需真实财报时，可用 `examples/sample-report.pdf`（虚构公司"星海智能"）直接跑通全流程验证；把真实财报 PDF 放入 `examples/` 并修改 `sample-input.json` 的 `report_path` 后重跑即可。
 
 ## 质量门控
 

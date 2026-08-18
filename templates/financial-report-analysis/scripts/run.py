@@ -6,6 +6,11 @@
     export LLM_MODEL=qwen2.5:7b
     python scripts/run.py examples/sample-input.json -o output/
 
+也支持 .env 文件（模板根目录），格式见 .env.example：
+    LLM_BASE_URL=https://openrouter.ai/api/v1
+    LLM_MODEL=nvidia/nemotron-3-ultra-550b-a55b:free
+    LLM_API_KEY=sk-or-v1-xxx
+
 流水线（DAG）：parse -> extract -> analyze -> validate -> review -> render
 """
 import argparse
@@ -15,6 +20,11 @@ import re
 import sys
 import urllib.request
 from pathlib import Path
+
+try:
+    from dotenv import load_dotenv
+except ImportError:
+    load_dotenv = None
 
 
 def parse_pdf(path: str) -> str:
@@ -32,7 +42,12 @@ def parse_pdf(path: str) -> str:
 
 
 def call_llm(system: str, user: str, base_url: str, api_key: str, model: str) -> str:
-    """调用任意 OpenAI 兼容接口（Ollama / Dify / DeepSeek / 本地 vLLM...）"""
+    """调用任意 OpenAI 兼容接口（Ollama / Dify / DeepSeek / 本地 vLLM...）
+
+    质量门控 fault_tolerance：网络失败自动重试（3 次，指数退避）。
+    """
+    import time
+
     payload = {
         "model": model,
         "messages": [
@@ -46,9 +61,18 @@ def call_llm(system: str, user: str, base_url: str, api_key: str, model: str) ->
         data=json.dumps(payload).encode("utf-8"),
         headers={"Content-Type": "application/json", "Authorization": f"Bearer {api_key}"},
     )
-    with urllib.request.urlopen(req, timeout=180) as resp:
-        data = json.loads(resp.read().decode("utf-8"))
-    return data["choices"][0]["message"]["content"]
+    last_err = None
+    for attempt in range(3):
+        try:
+            with urllib.request.urlopen(req, timeout=180) as resp:
+                data = json.loads(resp.read().decode("utf-8"))
+            return data["choices"][0]["message"]["content"]
+        except Exception as e:  # 网络抖动 / 限流，重试
+            last_err = e
+            wait = 3 * (attempt + 1)
+            print(f"[retry] 第 {attempt + 1} 次失败（{type(e).__name__}），{wait}s 后重试")
+            time.sleep(wait)
+    raise last_err
 
 
 def extract_json(text: str):
@@ -117,11 +141,14 @@ def main() -> None:
     ap.add_argument("-o", "--output", default="output", help="输出目录")
     args = ap.parse_args()
 
+    root = Path(__file__).resolve().parent.parent  # 模板根目录
+    if load_dotenv is not None:
+        load_dotenv(root / ".env")  # 支持根目录 .env 配置（必须先于环境变量读取）
+
     base_url = os.environ.get("LLM_BASE_URL", "http://localhost:11434/v1")
     api_key = os.environ.get("LLM_API_KEY", "ollama")
     model = os.environ.get("LLM_MODEL", "qwen2.5:7b")
 
-    root = Path(__file__).resolve().parent.parent  # 模板根目录
     spec = json.loads(Path(args.input).read_text(encoding="utf-8"))
     out_dir = Path(args.output)
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -152,10 +179,10 @@ def main() -> None:
                     base_url, api_key, model)
     analysis = extract_json(raw2)
 
-    # 4/4 validate + review + render
+    # 4/4 review + validate + render（先人审，再对最终交付物做契约校验）
     result = {**extracted, **analysis}
-    validate_output(result, root / "schema" / "output.schema.json")
     result = human_review(result)
+    validate_output(result, root / "schema" / "output.schema.json")
 
     (out_dir / "data.json").write_text(
         json.dumps(result, ensure_ascii=False, indent=2), encoding="utf-8")
