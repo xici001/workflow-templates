@@ -1,0 +1,7 @@
+{
+  "company_name": "示例科技股份",
+  "report_path": "examples/sample-report.pdf",
+  "report_type": "annual",
+  "industry": "智能制造",
+  "compare_periods": 2
+}

@@ -1,0 +1,24 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "财报分析输出契约",
+  "type": "object",
+  "required": ["summary", "metrics", "trend", "risk_signals", "human_review_required"],
+  "properties": {
+    "summary": { "type": "string", "description": "300 字以内总体评价" },
+    "metrics": {
+      "type": "object",
+      "required": ["revenue", "net_profit", "gross_margin", "roe", "debt_ratio", "operating_cash_flow"],
+      "properties": {
+        "revenue": { "type": ["number", "null"], "description": "营业收入（元）" },
+        "net_profit": { "type": ["number", "null"], "description": "净利润（元）" },
+        "gross_margin": { "type": ["number", "null"], "description": "毛利率（%）" },
+        "roe": { "type": ["number", "null"], "description": "净资产收益率（%）" },
+        "debt_ratio": { "type": ["number", "null"], "description": "资产负债率（%）" },
+        "operating_cash_flow": { "type": ["number", "null"], "description": "经营活动现金流净额（元）" }
+      }
+    },
+    "trend": { "type": "string", "description": "同比 / 环比趋势判断（注明口径）" },
+    "risk_signals": { "type": "array", "items": { "type": "string" }, "description": "风险信号：现金流与利润背离、应收账款激增、存货积压、商誉占比过高、负债率异常等" },
+    "human_review_required": { "type": "boolean", "description": "是否必须人工复核，默认 true" }
+  }
+}

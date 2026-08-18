@@ -1,0 +1,13 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "财报分析输入契约",
+  "type": "object",
+  "required": ["company_name", "report_path", "report_type"],
+  "properties": {
+    "company_name": { "type": "string", "description": "公司名称" },
+    "report_path": { "type": "string", "description": "财报 PDF 路径（相对模板目录或绝对路径）" },
+    "report_type": { "type": "string", "enum": ["annual", "quarterly"], "description": "年报 / 季报" },
+    "industry": { "type": "string", "description": "所属行业（可选，用于对标）" },
+    "compare_periods": { "type": "integer", "minimum": 1, "default": 2, "description": "对比期数（同比/环比）" }
+  }
+}

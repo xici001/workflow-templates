@@ -1,0 +1,32 @@
+{
+  "id": "financial-report-analysis",
+  "name": "财报分析自动化工作流",
+  "version": "0.1.0",
+  "description": "把财报 PDF 转化为结构化指标 + 分析报告",
+  "dag": {
+    "nodes": [
+      { "id": "parse", "type": "doc-parse", "input": "pdf", "output": "text", "depends_on": [] },
+      { "id": "extract", "type": "llm-extract", "input": "text", "output": "metrics", "depends_on": ["parse"] },
+      { "id": "analyze", "type": "llm-analyze", "input": "metrics", "output": "analysis", "depends_on": ["extract"] },
+      { "id": "validate", "type": "schema-check", "input": "analysis", "output": "validated", "depends_on": ["analyze"] },
+      { "id": "review", "type": "human-review", "input": "validated", "output": "approved", "depends_on": ["validate"] },
+      { "id": "render", "type": "render", "input": "approved", "output": "report", "depends_on": ["review"] }
+    ],
+    "quality_gates": [
+      { "stage": "validate", "rule": "输出符合 output.schema.json，数值交叉校验通过" },
+      { "stage": "review", "rule": "财务数字必须人工确认，未确认时 human_review_required=true" }
+    ],
+    "fault_tolerance": {
+      "retry": 2,
+      "fallback": "本地模型兜底 API",
+      "escalate": "转人工处理"
+    },
+    "cost_routing": {
+      "simple_steps": "本地小模型",
+      "complex_steps": "OpenAI 兼容 API"
+    }
+  },
+  "input_schema": "schema/input.schema.json",
+  "output_schema": "schema/output.schema.json",
+  "outputs": ["output/data.json", "output/report.md"]
+}
