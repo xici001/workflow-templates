@@ -8,3 +8,4 @@ output/
 .DS_Store
 .idea/
 .vscode/
+.mcp_input_*.json
