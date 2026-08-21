@@ -64,7 +64,7 @@ def call_llm(system: str, user: str, base_url: str, api_key: str, model: str) ->
     last_err = None
     for attempt in range(3):
         try:
-            with urllib.request.urlopen(req, timeout=180) as resp:
+            with urllib.request.urlopen(req, timeout=90) as resp:
                 data = json.loads(resp.read().decode("utf-8"))
             return data["choices"][0]["message"]["content"]
         except Exception as e:  # 网络抖动 / 限流，重试
@@ -139,6 +139,11 @@ def main() -> None:
     ap = argparse.ArgumentParser(description="财报分析工作流 v0.1")
     ap.add_argument("input", help="输入 JSON 路径（见 schema/input.schema.json）")
     ap.add_argument("-o", "--output", default="output", help="输出目录")
+    ap.add_argument(
+        "--auto-review",
+        action="store_true",
+        help="自动化复核：跳过人工确认，human_review_required=false（调用方负责核验数字）",
+    )
     args = ap.parse_args()
 
     root = Path(__file__).resolve().parent.parent  # 模板根目录
@@ -181,7 +186,11 @@ def main() -> None:
 
     # 4/4 review + validate + render（先人审，再对最终交付物做契约校验）
     result = {**extracted, **analysis}
-    result = human_review(result)
+    if args.auto_review:
+        result["human_review_required"] = False
+        result["review_note"] = "自动化复核（调用方负责核验）"
+    else:
+        result = human_review(result)
     validate_output(result, root / "schema" / "output.schema.json")
 
     (out_dir / "data.json").write_text(
