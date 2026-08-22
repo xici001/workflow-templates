@@ -6,6 +6,10 @@
 开源 AI 自动化工作流模板集合。每个模板都是一条可复用的"数字管道"：
 从触发源（输入）→ 处理流水线（编排 / 模型 / 质量门控）→ 交付物（输出）。
 
+## 演示 / Demo
+
+完整故事见博客《四天四个开源项目》（含 3D 可视化截图与踩坑实录）：<https://github.com/xici001/factory-twin-viz/blob/main/docs/screenshot.png>（看 3D 工厂效果）；也可以直接看本仓库跑出来的[首份财报分析报告](templates/financial-report-analysis/output/report.md)。
+
 ## 为什么做这个项目
 
 AI 不缺模型，缺的是"把模型用起来的管道"。
