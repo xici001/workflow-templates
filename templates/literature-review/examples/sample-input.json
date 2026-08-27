@@ -1,0 +1,37 @@
+{
+  "topic": "数字孪生技术在智能制造中的应用",
+  "style": "academic",
+  "section_count": 3,
+  "papers": [
+    {
+      "title": "Digital Twin in Industry: State-of-the-Art",
+      "year": 2019,
+      "venue": "IEEE TII",
+      "abstract": "系统梳理数字孪生概念起源与工业应用框架，提出数字孪生的五维模型（物理实体、虚拟模型、数据、连接、服务），并给出航空航天、制造等领域的典型应用案例。指出数据集成与模型实时性仍是主要挑战。"
+    },
+    {
+      "title": "数字孪生驱动的车间运行优化方法",
+      "year": 2021,
+      "venue": "计算机集成制造系统",
+      "abstract": "提出面向离散制造车间的数字孪生运行架构，基于实时数据驱动设备调度与产线平衡优化，实验表明可提升设备利用率约 12%。强调数据采集层（PLC/传感器）与三维可视化层的解耦设计。"
+    },
+    {
+      "title": "A Review of Digital Twin for Predictive Maintenance",
+      "year": 2022,
+      "venue": "Journal of Manufacturing Systems",
+      "abstract": "综述数字孪生在预测性维护中的应用，总结基于振动、温度信号的设备健康模型，比较机理模型与数据驱动方法的优劣，指出缺乏跨设备泛化能力与实时边缘计算支持是当前瓶颈。"
+    },
+    {
+      "title": "数字孪生与工业互联网平台集成研究",
+      "year": 2023,
+      "venue": "中国机械工程",
+      "abstract": "探讨数字孪生与工业互联网平台的双向集成路径，提出以 MQTT/OPC-UA 为数据通道、以微服务承载孪生模型的架构方案，并在注塑车间完成验证，模型同步延迟小于 200ms。"
+    },
+    {
+      "title": "Human-in-the-loop Digital Twin for Smart Factory",
+      "year": 2024,
+      "venue": "CIRP Annals",
+      "abstract": "提出人在环的数字孪生交互框架，将操作员决策纳入孪生闭环，通过 AR 叠加显示设备状态并支持远程干预，实验表明故障响应时间缩短 35%，但人机信任与人因评估仍待研究。"
+    }
+  ]
+}

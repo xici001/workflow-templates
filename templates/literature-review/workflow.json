@@ -1,0 +1,25 @@
+{
+  "id": "literature-review",
+  "name": "文献综述初稿工作流",
+  "version": "0.1.0",
+  "description": "输入文献摘要列表，自动生成结构化文献综述初稿（背景/分节/关键文献/研究缺口/参考文献）",
+  "dag": {
+    "nodes": [
+      { "id": "summarize", "type": "llm-summarize", "input": "papers", "output": "paper_notes", "depends_on": [] },
+      { "id": "cluster", "type": "llm-cluster", "input": "paper_notes", "output": "clusters", "depends_on": ["summarize"] },
+      { "id": "draft", "type": "llm-draft", "input": "clusters", "output": "draft", "depends_on": ["cluster"] },
+      { "id": "validate", "type": "schema-check", "input": "draft", "output": "validated", "depends_on": ["draft"] },
+      { "id": "review", "type": "human-review", "input": "validated", "output": "approved", "depends_on": ["validate"] },
+      { "id": "render", "type": "render", "input": "approved", "output": "report", "depends_on": ["review"] }
+    ],
+    "quality_gates": [
+      { "stage": "validate", "rule": "输出符合 output.schema.json，引用条目必须来自输入文献" },
+      { "stage": "review", "rule": "关键结论须与原始文献核对，未确认时 human_review_required=true" }
+    ],
+    "fault_tolerance": { "retry": 2, "fallback": "本地模型兜底 API", "escalate": "转人工处理" },
+    "cost_routing": { "simple_steps": "本地小模型", "complex_steps": "OpenAI 兼容 API" }
+  },
+  "input_schema": "schema/input.schema.json",
+  "output_schema": "schema/output.schema.json",
+  "outputs": ["output/data.json", "output/report.md"]
+}

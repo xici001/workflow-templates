@@ -1,0 +1,25 @@
+{
+  "id": "xiaohongshu-copy",
+  "name": "小红书爆款文案工作流",
+  "version": "0.1.0",
+  "description": "输入主题/卖点，自动生成小红书爆款文案（备选标题/正文/话题标签/发布建议）",
+  "dag": {
+    "nodes": [
+      { "id": "extract", "type": "llm-extract", "input": "topic", "output": "selling_points", "depends_on": [] },
+      { "id": "draft", "type": "llm-draft", "input": "selling_points", "output": "draft", "depends_on": ["extract"] },
+      { "id": "enhance", "type": "llm-enhance", "input": "draft", "output": "enhanced", "depends_on": ["draft"] },
+      { "id": "validate", "type": "schema-check", "input": "enhanced", "output": "validated", "depends_on": ["enhance"] },
+      { "id": "review", "type": "human-review", "input": "validated", "output": "approved", "depends_on": ["validate"] },
+      { "id": "render", "type": "render", "input": "approved", "output": "report", "depends_on": ["review"] }
+    ],
+    "quality_gates": [
+      { "stage": "validate", "rule": "输出符合 output.schema.json，标题 3 个、标签 5-10 个" },
+      { "stage": "review", "rule": "文案须人工确认品牌口径与合规性，未确认时 human_review_required=true" }
+    ],
+    "fault_tolerance": { "retry": 2, "fallback": "本地模型兜底 API", "escalate": "转人工处理" },
+    "cost_routing": { "simple_steps": "本地小模型", "complex_steps": "OpenAI 兼容 API" }
+  },
+  "input_schema": "schema/input.schema.json",
+  "output_schema": "schema/output.schema.json",
+  "outputs": ["output/data.json", "output/report.md"]
+}

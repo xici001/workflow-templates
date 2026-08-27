@@ -20,9 +20,11 @@ AI 不缺模型，缺的是"把模型用起来的管道"。
 
 | 模板 | 场景 | 输入 | 输出 | 状态 |
 |------|------|------|------|------|
-| 财报分析 | 个股 / 公司财报速读 | PDF / 公告 | 结构化指标 + Markdown 报告 | v0.1 开发中 |
-| 文献综述初稿 | 学术写作 | 检索结果 / PDF | 综述初稿 | 规划中 |
-| 小红书爆款文案 | 内容创作 | 选题关键词 | 文案 + 话题标签 | 规划中 |
+| [财报分析](templates/financial-report-analysis/README.md) | 个股 / 公司财报速读 | PDF / 公告 | 结构化指标 + Markdown 报告 | ✅ v0.1 |
+| [文献综述初稿](templates/literature-review/README.md) | 学术写作 | 文献摘要列表 | 综述初稿（分节/缺口/参考文献） | ✅ v0.1 |
+| [小红书爆款文案](templates/xiaohongshu-copy/README.md) | 内容创作 | 选题 + 卖点 | 3 标题 + 正文 + 标签 + 发布建议 | ✅ v0.1 |
+
+每个模板都可独立运行：`cd templates/<模板名> && python scripts/run.py examples/sample-input.json -o output/`。
 
 ## 核心设计：输入-处理-输出契约
 
@@ -32,15 +34,17 @@ AI 不缺模型，缺的是"把模型用起来的管道"。
 2. **处理契约**：DAG 编排（解析 → 抽取 → 分析 → 校验 → 人审 → 报告），含质量门控与失败降级
 3. **输出契约**：结构化交付物，Schema 校验 + 人审关卡
 
-## 快速开始（财报分析模板）
+## 快速开始（任一模板）
 
 ```bash
-cd templates/financial-report-analysis
+cd templates/literature-review        # 或 financial-report-analysis / xiaohongshu-copy
 pip install -r requirements.txt
-# 默认走本地模型（Ollama），也可换成任意 OpenAI 兼容 API
+# 默认走本地模型（Ollama），也可换成任意 OpenAI 兼容 API（模板根目录 .env 配置）
 export LLM_BASE_URL=http://localhost:11434/v1
 export LLM_MODEL=qwen2.5:7b
 python scripts/run.py examples/sample-input.json -o output/
+# 自动化复核（跳过人工确认，调用方负责核验）
+python scripts/run.py examples/sample-input.json -o output/ --auto-review
 ```
 
 ## 技术栈

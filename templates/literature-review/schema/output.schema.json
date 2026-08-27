@@ -1,0 +1,37 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "文献综述输出契约",
+  "type": "object",
+  "required": ["title", "overview", "sections", "key_papers", "research_gaps", "references", "human_review_required"],
+  "properties": {
+    "title": { "type": "string", "description": "综述标题" },
+    "overview": { "type": "string", "description": "300 字以内研究背景概述" },
+    "sections": {
+      "type": "array",
+      "description": "综述正文分节（按主题聚类组织）",
+      "items": {
+        "type": "object",
+        "required": ["heading", "content"],
+        "properties": {
+          "heading": { "type": "string", "description": "分节标题" },
+          "content": { "type": "string", "description": "分节内容（300 字以上，需引用具体文献）" }
+        }
+      }
+    },
+    "key_papers": {
+      "type": "array",
+      "description": "关键文献与贡献",
+      "items": {
+        "type": "object",
+        "required": ["title", "contribution"],
+        "properties": {
+          "title": { "type": "string" },
+          "contribution": { "type": "string", "description": "该文献的核心贡献/发现" }
+        }
+      }
+    },
+    "research_gaps": { "type": "array", "items": { "type": "string" }, "description": "研究缺口（2-4 条，须基于输入文献推断）" },
+    "references": { "type": "array", "items": { "type": "string" }, "description": "参考文献条目，必须全部来自输入文献" },
+    "human_review_required": { "type": "boolean", "description": "是否必须人工复核，默认 true" }
+  }
+}

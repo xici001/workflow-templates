@@ -1,0 +1,13 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "小红书文案输入契约",
+  "type": "object",
+  "required": ["topic"],
+  "properties": {
+    "topic": { "type": "string", "description": "内容主题/产品/场景，如「数字孪生工厂可视化方案」" },
+    "selling_points": { "type": "array", "items": { "type": "string" }, "description": "核心卖点（可选，不填则由 AI 提炼）" },
+    "audience": { "type": "string", "default": "泛科技人群", "description": "目标人群" },
+    "tone": { "type": "string", "enum": ["种草", "干货", "人设", "情绪"], "default": "种草", "description": "内容风格" },
+    "word_limit": { "type": "integer", "minimum": 100, "maximum": 2000, "default": 500, "description": "正文字数上限" }
+  }
+}

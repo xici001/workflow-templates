@@ -1,0 +1,13 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "小红书文案输出契约",
+  "type": "object",
+  "required": ["titles", "body", "tags", "publish_tips", "human_review_required"],
+  "properties": {
+    "titles": { "type": "array", "items": { "type": "string" }, "description": "3 个备选标题（15-20 字，含数字/悬念/痛点词）" },
+    "body": { "type": "string", "description": "正文（含 emoji 分段、口语化、控制在 word_limit 内）" },
+    "tags": { "type": "array", "items": { "type": "string" }, "description": "5-10 个话题标签（不带 #）" },
+    "publish_tips": { "type": "array", "items": { "type": "string" }, "description": "发布时间/首图/互动引导等建议（2-4 条）" },
+    "human_review_required": { "type": "boolean", "description": "是否必须人工复核，默认 true" }
+  }
+}
